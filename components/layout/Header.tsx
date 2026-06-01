@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 
 function SearchBar() {
@@ -117,7 +117,9 @@ export default function Header() {
 
           {/* Barra de búsqueda — centro */}
           <div className="flex-1 flex justify-center px-2 hidden sm:flex">
-            <SearchBar />
+            <Suspense fallback={<div className="w-full max-w-md h-10 rounded-2xl bg-beni-deep/30 animate-pulse" />}>
+              <SearchBar />
+            </Suspense>
           </div>
 
           {/* Nav + Auth */}
@@ -198,7 +200,9 @@ export default function Header() {
 
         {/* Barra de búsqueda mobile */}
         <div className="sm:hidden pb-3">
-          <SearchBar />
+          <Suspense fallback={<div className="w-full h-10 rounded-2xl bg-beni-deep/30 animate-pulse" />}>
+            <SearchBar />
+          </Suspense>
         </div>
       </div>
     </header>
