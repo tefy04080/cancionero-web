@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { songRepository } from '@/lib/repositories/song.repository'
 import { moderateSongSchema } from '@/lib/validators/song.schema'
 import { SongStatus } from '@prisma/client'

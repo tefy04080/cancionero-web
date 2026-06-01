@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { songRepository } from '@/lib/repositories/song.repository'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import { contributeSongSchema } from '@/lib/validators/song.schema'
 
 // GET /api/songs — Listar canciones aprobadas (público)
