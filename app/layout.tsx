@@ -45,6 +45,9 @@ export default function RootLayout({
             <p className="text-beni-sand/50 text-sm font-body">
               🌿 Cancionero del Beni — Preservando la cultura musical del Oriente Boliviano
             </p>
+            <p className="text-beni-sand/30 text-xs font-body mt-2">
+              Sistema Creado Por <span className="text-beni-gold/50 font-medium">Estefani Orihuela Banegas</span>
+            </p>
           </footer>
         </AuthProvider>
       </body>
