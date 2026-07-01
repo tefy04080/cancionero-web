@@ -101,9 +101,14 @@ function LoginContent() {
         </div>
 
         {/* Decorativo */}
-        <p className="text-center text-beni-sand/30 text-xs font-body mt-6">
-          🌿 Preservando la cultura musical del Oriente Boliviano
-        </p>
+        <div className="text-center mt-6 space-y-2">
+          <p className="text-beni-sand/30 text-xs font-body">
+            🌿 Preservando la cultura musical del Oriente Boliviano
+          </p>
+          <p className="text-beni-sand/30 text-[10px] font-body">
+            Sistema Creado Por <span className="text-beni-gold/50 font-medium">Estefani Orihuela Banegas</span>
+          </p>
+        </div>
       </div>
     </div>
   )
