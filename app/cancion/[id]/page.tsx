@@ -2,10 +2,13 @@ import { songRepository } from '@/lib/repositories/song.repository'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import LikeButton from '@/components/songs/LikeButton'
 import CommentsSection from '@/components/songs/CommentsSection'
 import ShareButton from '@/components/songs/ShareButton'
 import DownloadButton from '@/components/songs/DownloadButton'
+import AdminSongActions from '@/components/songs/AdminSongActions'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -29,10 +32,12 @@ function getYouTubeEmbedId(url: string): string | null {
 export default async function SongDetailPage({ params }: Props) {
   const { id } = await params
   const song = await songRepository.getSongById(id)
+  const session = await getServerSession(authOptions)
 
   if (!song) notFound()
 
   const videoId = getYouTubeEmbedId(song.youtubeUrl)
+  const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
   return (
     <div className="jungle-bg min-h-screen py-8 px-4">
@@ -66,6 +71,20 @@ export default async function SongDetailPage({ params }: Props) {
             </p>
           )}
         </div>
+
+        {/* Panel admin — solo visible para ADMIN */}
+        {isAdmin && (
+          <AdminSongActions
+            song={{
+              id: song.id,
+              title: song.title,
+              authorName: (song as any).authorName ?? null,
+              youtubeUrl: song.youtubeUrl,
+              rhythmType: song.rhythmType,
+              lyrics: song.lyrics ?? null,
+            }}
+          />
+        )}
 
         {/* Barra de acciones: Like + Descarga */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
