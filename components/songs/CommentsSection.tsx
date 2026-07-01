@@ -83,15 +83,17 @@ export default function CommentsSection({ songId }: Props) {
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="flex gap-3">
             {session.user.image ? (
-              <Image
-                src={session.user.image}
-                alt={session.user.name ?? 'Tu avatar'}
-                width={36}
-                height={36}
-                className="rounded-full border-2 border-beni-gold/30 shrink-0 mt-1"
-              />
+              <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-beni-gold/30 shrink-0 mt-1">
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name ?? 'Tu avatar'}
+                  width={36}
+                  height={36}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             ) : (
-              <div className="w-9 h-9 rounded-full bg-beni-deep flex items-center justify-center text-beni-gold font-bold shrink-0 mt-1">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-beni-deep flex items-center justify-center text-beni-gold font-bold shrink-0 mt-1">
                 {session.user.name?.charAt(0) ?? '?'}
               </div>
             )}
@@ -157,15 +159,17 @@ export default function CommentsSection({ songId }: Props) {
           {comments.map(comment => (
             <div key={comment.id} className="flex gap-3">
               {comment.author.image ? (
-                <Image
-                  src={comment.author.image}
-                  alt={comment.author.name ?? 'Usuario'}
-                  width={36}
-                  height={36}
-                  className="rounded-full border border-beni-deep/40 shrink-0 mt-0.5"
-                />
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-beni-deep/40 shrink-0 mt-0.5">
+                  <Image
+                    src={comment.author.image}
+                    alt={comment.author.name ?? 'Usuario'}
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ) : (
-                <div className="w-9 h-9 rounded-full bg-beni-deep flex items-center justify-center text-beni-gold font-bold text-sm shrink-0 mt-0.5">
+                <div className="w-9 h-9 rounded-full overflow-hidden bg-beni-deep flex items-center justify-center text-beni-gold font-bold text-sm shrink-0 mt-0.5">
                   {comment.author.name?.charAt(0) ?? '?'}
                 </div>
               )}
