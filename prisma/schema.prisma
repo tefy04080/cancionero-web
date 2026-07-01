@@ -1,5 +1,4 @@
 // Prisma schema — Cancionero del Beni
-// Producción: PostgreSQL (Neon) | Local: puede usar la misma BD Neon
 
 generator client {
   provider = "prisma-client-js"
@@ -47,6 +46,8 @@ model User {
   songs         Song[]
   accounts      Account[]
   sessions      Session[]
+  comments      Comment[]
+  likes         Like[]
   createdAt     DateTime  @default(now())
 }
 
@@ -59,14 +60,39 @@ model VerificationToken {
 }
 
 model Song {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   title      String
-  lyrics     String
+  authorName String?   // Nombre del compositor/artista
+  lyrics     String?   // Letra (opcional)
   youtubeUrl String
   rhythmType String
-  status     String   @default("PENDING")
+  status     String    @default("PENDING")
   authorId   String?
-  author     User?    @relation(fields: [authorId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  author     User?     @relation(fields: [authorId], references: [id])
+  comments   Comment[]
+  likes      Like[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  songId    String
+  createdAt DateTime @default(now())
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  song   Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id     String @id @default(cuid())
+  userId String
+  songId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song Song @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, songId])
 }

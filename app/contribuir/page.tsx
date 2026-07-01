@@ -12,6 +12,7 @@ const RHYTHM_OPTIONS = [
   'Sirilla',
   'Sarao',
   'Baile del Monte',
+  'Carnavalito',
   'Otro',
 ]
 
@@ -19,13 +20,15 @@ export default function ContribuirPage() {
   const { data: session } = useSession()
   const router = useRouter()
 
-  const [form, setForm] = useState<ContributeSongInput>({
+  const [form, setForm] = useState({
     title: '',
+    authorName: '',
     youtubeUrl: '',
     rhythmType: '',
+    customRhythm: '',   // para cuando selecciona "Otro"
     lyrics: '',
   })
-  const [errors, setErrors] = useState<Partial<Record<keyof ContributeSongInput, string>>>({})
+  const [errors, setErrors] = useState<Partial<Record<string, string>>>({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
@@ -34,20 +37,36 @@ export default function ContribuirPage() {
   ) => {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
-    if (errors[name as keyof ContributeSongInput]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }))
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: undefined }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors({})
 
-    const validation = contributeSongSchema.safeParse(form)
+    // Resolver el ritmo: si eligió "Otro", usar el texto personalizado
+    const rhythmType = form.rhythmType === 'Otro'
+      ? form.customRhythm.trim()
+      : form.rhythmType
+
+    if (form.rhythmType === 'Otro' && !rhythmType) {
+      setErrors(prev => ({ ...prev, customRhythm: 'Escribe el nombre del ritmo' }))
+      return
+    }
+
+    const payload: ContributeSongInput = {
+      title: form.title,
+      authorName: form.authorName || undefined,
+      youtubeUrl: form.youtubeUrl,
+      rhythmType,
+      lyrics: form.lyrics || undefined,
+    }
+
+    const validation = contributeSongSchema.safeParse(payload)
     if (!validation.success) {
-      const fieldErrors: Partial<Record<keyof ContributeSongInput, string>> = {}
+      const fieldErrors: Partial<Record<string, string>> = {}
       for (const issue of validation.error.issues) {
-        const field = issue.path[0] as keyof ContributeSongInput
+        const field = String(issue.path[0])
         fieldErrors[field] = issue.message
       }
       setErrors(fieldErrors)
@@ -59,7 +78,7 @@ export default function ContribuirPage() {
       const res = await fetch('/api/songs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
 
       if (res.ok) {
@@ -122,7 +141,30 @@ export default function ContribuirPage() {
 
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="glass-card rounded-3xl p-6 md:p-8 space-y-6">
-          {/* Título */}
+
+          {/* 1. Autor / Compositor */}
+          <div>
+            <label htmlFor="authorName" className="block text-beni-cream font-medium mb-2 font-body text-sm">
+              🎤 Autor o Compositor
+              <span className="text-beni-sand/40 font-normal ml-1">(opcional)</span>
+            </label>
+            <input
+              id="authorName"
+              name="authorName"
+              type="text"
+              value={form.authorName}
+              onChange={handleChange}
+              placeholder="Ej: Gilberto Rojas, Autora desconocida..."
+              className={`input-jungle ${errors.authorName ? 'border-beni-terra/60' : ''}`}
+            />
+            {errors.authorName && (
+              <p className="text-beni-terra text-xs mt-1 flex items-center gap-1">
+                <span>⚠️</span> {errors.authorName}
+              </p>
+            )}
+          </div>
+
+          {/* 2. Título */}
           <div>
             <label htmlFor="title" className="block text-beni-cream font-medium mb-2 font-body text-sm">
               📝 Título de la canción <span className="text-beni-terra">*</span>
@@ -143,7 +185,7 @@ export default function ContribuirPage() {
             )}
           </div>
 
-          {/* URL de YouTube */}
+          {/* 3. URL de YouTube */}
           <div>
             <label htmlFor="youtubeUrl" className="block text-beni-cream font-medium mb-2 font-body text-sm">
               🎬 Enlace de YouTube <span className="text-beni-terra">*</span>
@@ -164,7 +206,7 @@ export default function ContribuirPage() {
             )}
           </div>
 
-          {/* Ritmo */}
+          {/* 4. Ritmo */}
           <div>
             <label htmlFor="rhythmType" className="block text-beni-cream font-medium mb-2 font-body text-sm">
               🥁 Ritmo Cultural <span className="text-beni-terra">*</span>
@@ -182,28 +224,51 @@ export default function ContribuirPage() {
                   <option key={r} value={r}>{r}</option>
                 ))}
               </select>
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-beni-sand/50 pointer-events-none">
-                ▾
-              </span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-beni-sand/50 pointer-events-none">▾</span>
             </div>
             {errors.rhythmType && (
               <p className="text-beni-terra text-xs mt-1 flex items-center gap-1">
                 <span>⚠️</span> {errors.rhythmType}
               </p>
             )}
+
+            {/* Campo adicional si selecciona "Otro" */}
+            {form.rhythmType === 'Otro' && (
+              <div className="mt-3">
+                <label htmlFor="customRhythm" className="block text-beni-light text-xs mb-1 font-body">
+                  ✍️ Escribe el nombre del ritmo <span className="text-beni-terra">*</span>
+                </label>
+                <input
+                  id="customRhythm"
+                  name="customRhythm"
+                  type="text"
+                  value={form.customRhythm}
+                  onChange={handleChange}
+                  placeholder="Ej: Polca Beniana, Joropo, Cumbia..."
+                  className={`input-jungle ${errors.customRhythm ? 'border-beni-terra/60' : ''}`}
+                  autoFocus
+                />
+                {errors.customRhythm && (
+                  <p className="text-beni-terra text-xs mt-1 flex items-center gap-1">
+                    <span>⚠️</span> {errors.customRhythm}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Letra */}
+          {/* 5. Letra (Opcional) */}
           <div>
             <label htmlFor="lyrics" className="block text-beni-cream font-medium mb-2 font-body text-sm">
-              📜 Letra de la canción <span className="text-beni-terra">*</span>
+              📜 Letra de la canción
+              <span className="text-beni-sand/40 font-normal ml-1">(opcional)</span>
             </label>
             <textarea
               id="lyrics"
               name="lyrics"
               value={form.lyrics}
               onChange={handleChange}
-              placeholder="Escribe aquí la letra completa de la canción..."
+              placeholder="Escribe aquí la letra de la canción... (puedes dejarlo vacío si no la conoces)"
               rows={10}
               className={`textarea-jungle ${errors.lyrics ? 'border-beni-terra/60' : ''}`}
             />
@@ -212,7 +277,11 @@ export default function ContribuirPage() {
                 <p className="text-beni-terra text-xs flex items-center gap-1">
                   <span>⚠️</span> {errors.lyrics}
                 </p>
-              ) : <span />}
+              ) : (
+                <p className="text-beni-sand/40 text-xs">
+                  Si no conoces la letra, puedes dejar este campo vacío
+                </p>
+              )}
               <span className="text-beni-sand/40 text-xs">{form.lyrics.length}/5000</span>
             </div>
           </div>
@@ -235,9 +304,7 @@ export default function ContribuirPage() {
             className="btn-primary w-full justify-center text-base py-3 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <>
-                <span className="animate-spin">⟳</span> Enviando...
-              </>
+              <><span className="animate-spin">⟳</span> Enviando...</>
             ) : (
               <>🌿 Enviar para Revisión</>
             )}

@@ -2,6 +2,8 @@ import { songRepository } from '@/lib/repositories/song.repository'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import LikeButton from '@/components/songs/LikeButton'
+import CommentsSection from '@/components/songs/CommentsSection'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -13,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!song) return { title: 'Canción no encontrada' }
   return {
     title: `${song.title} (${song.rhythmType}) | Cancionero del Beni`,
-    description: song.lyrics.slice(0, 160),
+    description: song.lyrics?.slice(0, 160) ?? `${song.title} — ${song.rhythmType} del Beni`,
   }
 }
 
@@ -33,6 +35,7 @@ export default async function SongDetailPage({ params }: Props) {
   return (
     <div className="jungle-bg min-h-screen py-8 px-4">
       <div className="max-w-7xl mx-auto">
+
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-beni-sand/50 mb-8 font-body">
           <Link href="/" className="hover:text-beni-gold transition-colors">Inicio</Link>
@@ -41,18 +44,71 @@ export default async function SongDetailPage({ params }: Props) {
         </div>
 
         {/* Header de la canción */}
-        <div className="mb-8">
+        <div className="mb-6">
           <span className="rhythm-badge mb-3 inline-flex">
             🎵 {song.rhythmType}
           </span>
-          <h1 className="font-heading font-black text-3xl md:text-4xl text-beni-cream mb-2">
+          <h1 className="font-heading font-black text-3xl md:text-4xl text-beni-cream mb-1">
             {song.title}
           </h1>
-          {song.author?.name && (
-            <p className="text-beni-sand/60 font-body text-sm">
-              Aportado por <span className="text-beni-light">{song.author.name}</span>
+          {/* Autor compositor */}
+          {(song as any).authorName && (
+            <p className="text-beni-gold/80 font-body text-sm font-medium mt-1">
+              🎤 {(song as any).authorName}
             </p>
           )}
+          {/* Quién aportó */}
+          {song.author?.name && (
+            <p className="text-beni-sand/50 font-body text-xs mt-1">
+              Aportado por <span className="text-beni-light/70">{song.author.name}</span>
+            </p>
+          )}
+        </div>
+
+        {/* Barra de acciones: Like + Descarga */}
+        <div className="flex flex-wrap items-center gap-3 mb-8">
+          <LikeButton songId={song.id} />
+
+          {/* Botón Ver/Descargar en YouTube */}
+          <a
+            id="download-button"
+            href={song.youtubeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-medium text-sm transition-all duration-200"
+            style={{
+              background: 'rgba(255,0,0,0.08)',
+              border: '1px solid rgba(255,0,0,0.25)',
+              color: '#ff6b6b',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,0,0,0.15)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,0,0,0.08)')}
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2v2h14v-2H5z" />
+            </svg>
+            Descargar / Ver en YouTube
+          </a>
+
+          {/* Compartir */}
+          <button
+            id="share-button"
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: song.title, url: window.location.href })
+              } else {
+                navigator.clipboard.writeText(window.location.href)
+              }
+            }}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-medium text-sm transition-all duration-200 text-beni-sand/60 hover:text-beni-cream"
+            style={{ border: '1px solid rgba(82,183,136,0.15)' }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Compartir
+          </button>
         </div>
 
         {/* Layout: Video + Letra */}
@@ -79,7 +135,7 @@ export default async function SongDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* Info adicional */}
+            {/* Info del ritmo */}
             <div className="glass-card rounded-2xl p-5 mt-4">
               <h3 className="font-heading font-semibold text-beni-cream mb-3">
                 🌿 Sobre este ritmo
@@ -92,19 +148,35 @@ export default async function SongDetailPage({ params }: Props) {
 
           {/* Letra */}
           <div className="order-2">
-            <div className="glass-card rounded-2xl p-6 h-full">
+            <div className="glass-card rounded-2xl p-6 h-fit">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-heading font-bold text-beni-cream text-xl">
                   📜 Letra
                 </h2>
                 <div className="decorative-line" />
               </div>
-              <div className="lyrics-text font-body overflow-y-auto max-h-[500px] pr-2">
-                {song.lyrics}
-              </div>
+
+              {song.lyrics ? (
+                <div className="lyrics-text font-body overflow-y-auto max-h-[500px] pr-2 whitespace-pre-wrap">
+                  {song.lyrics}
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <div className="text-4xl mb-3">🎵</div>
+                  <p className="text-beni-sand/50 text-sm font-body">
+                    La letra de esta canción aún no ha sido registrada.
+                  </p>
+                  <p className="text-beni-sand/30 text-xs mt-2">
+                    ¿La conoces? Puedes aportarla desde el menú principal.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Comentarios */}
+        <CommentsSection songId={song.id} />
 
         {/* Botón volver */}
         <div className="mt-10 text-center">
@@ -125,6 +197,7 @@ function getRhythmDescription(rhythm: string): string {
     Sirilla: 'La Sirilla es un ritmo romántico y cadencioso del Oriente Boliviano. De influencia española y africana, se caracteriza por sus letras emotivas y su melodía nostálgica.',
     Sarao: 'El Sarao es una danza social del Beni que se baila en parejas. Heredero de los bailes de salón de la época colonial, fue adoptado y transformado por la cultura beniana.',
     'Baile del Monte': 'El Baile del Monte es una expresión artística de los pueblos originarios amazónicos del Beni. Celebra la conexión espiritual con la naturaleza y los ciclos de la selva.',
+    Carnavalito: 'El Carnavalito beniano es la expresión más festiva del Beni durante los carnavales. Mezcla ritmos autóctonos con el espíritu alegre de la tradición oriental boliviana.',
   }
   return descriptions[rhythm] ?? `El ${rhythm} es un ritmo tradicional del Departamento del Beni, parte invaluable del patrimonio cultural del Oriente Boliviano.`
 }

@@ -37,7 +37,8 @@ export const songRepository = {
 
   async createSong(data: {
     title: string
-    lyrics: string
+    authorName?: string
+    lyrics?: string
     youtubeUrl: string
     rhythmType: string
     authorId: string
