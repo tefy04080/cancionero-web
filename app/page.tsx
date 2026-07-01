@@ -47,7 +47,7 @@ export default async function HomePage({ searchParams }: Props) {
           </div>
 
           <div className="max-w-4xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 opacity-0 animate-fade-in-up delay-100"
               style={{ background: 'rgba(244,161,29,0.1)', border: '1px solid rgba(244,161,29,0.3)' }}>
               <span className="text-sm">🌿</span>
               <span className="text-beni-gold text-sm font-medium font-body">
@@ -55,7 +55,7 @@ export default async function HomePage({ searchParams }: Props) {
               </span>
             </div>
 
-            <h1 className="mb-6 flex justify-center">
+            <h1 className="mb-6 flex justify-center opacity-0 animate-zoom-in delay-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo.png"
@@ -65,12 +65,12 @@ export default async function HomePage({ searchParams }: Props) {
               />
             </h1>
 
-            <p className="font-body text-beni-sand/80 text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
+            <p className="font-body text-beni-sand/80 text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed opacity-0 animate-fade-in-up delay-300">
               Preservando la riqueza musical de nuestra tierra. Taquiraris, Chovenas, Macheteros
               y más ritmos que nacen del corazón de la Amazonía boliviana.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4 opacity-0 animate-fade-in-up delay-400">
               <Link href="#canciones" className="btn-primary text-base px-8 py-3">
                 🎵 Explorar Canciones
               </Link>
@@ -80,7 +80,7 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
 
             {/* Stats */}
-            <div className="flex items-center justify-center gap-8 mt-12">
+            <div className="flex items-center justify-center gap-8 mt-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms' }}>
               <div className="text-center">
                 <div className="font-heading font-black text-3xl text-gradient-gold">{allSongs.length}</div>
                 <div className="text-beni-sand/60 text-sm font-body">Canciones</div>
