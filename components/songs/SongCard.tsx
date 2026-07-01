@@ -28,7 +28,9 @@ interface SongCardProps {
 export default function SongCard({ song, index = 0 }: SongCardProps) {
   const rhythmStyle = getRhythmStyle(song.rhythmType)
   const thumbnail = getYouTubeThumbnail(song.youtubeUrl)
-  const lyricsPreview = song.lyrics.slice(0, 120) + (song.lyrics.length > 120 ? '...' : '')
+  const lyricsPreview = song.lyrics
+    ? song.lyrics.slice(0, 120) + (song.lyrics.length > 120 ? '...' : '')
+    : 'Sin letra registrada'
 
   return (
     <Link

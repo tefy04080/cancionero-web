@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import LikeButton from '@/components/songs/LikeButton'
 import CommentsSection from '@/components/songs/CommentsSection'
 import ShareButton from '@/components/songs/ShareButton'
+import DownloadButton from '@/components/songs/DownloadButton'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -71,25 +72,7 @@ export default async function SongDetailPage({ params }: Props) {
           <LikeButton songId={song.id} />
 
           {/* Botón Ver/Descargar en YouTube */}
-          <a
-            id="download-button"
-            href={song.youtubeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-medium text-sm transition-all duration-200"
-            style={{
-              background: 'rgba(255,0,0,0.08)',
-              border: '1px solid rgba(255,0,0,0.25)',
-              color: '#ff6b6b',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,0,0,0.15)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,0,0,0.08)')}
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 2v2h14v-2H5z" />
-            </svg>
-            Descargar / Ver en YouTube
-          </a>
+          <DownloadButton youtubeUrl={song.youtubeUrl} />
 
           {/* Compartir */}
           <ShareButton title={song.title} />
