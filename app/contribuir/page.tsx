@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import confetti from 'canvas-confetti'
 import { contributeSongSchema, type ContributeSongInput } from '@/lib/validators/song.schema'
 
 const RHYTHM_OPTIONS = [
@@ -31,6 +32,18 @@ export default function ContribuirPage() {
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({})
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    if (success) {
+      confetti({
+        particleCount: 100,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#f4a11d', '#52b788', '#ef4444', '#fef3e2'],
+        zIndex: 100
+      })
+    }
+  }, [success])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -98,7 +111,7 @@ export default function ContribuirPage() {
   if (success) {
     return (
       <div className="jungle-bg min-h-screen flex items-center justify-center px-4">
-        <div className="glass-card rounded-3xl p-12 text-center max-w-md">
+        <div className="glass-card rounded-3xl p-12 text-center max-w-md animate-zoom-in">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="font-heading font-bold text-2xl text-beni-cream mb-2">
             ¡Gracias por tu aporte!

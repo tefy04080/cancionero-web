@@ -156,8 +156,8 @@ export default function CommentsSection({ songId }: Props) {
         </div>
       ) : (
         <div className="space-y-4">
-          {comments.map(comment => (
-            <div key={comment.id} className="flex gap-3">
+          {comments.map((comment, i) => (
+            <div key={comment.id} className="flex gap-3 animate-slide-in-right" style={{ animationDelay: `${i * 50}ms` }}>
               {comment.author.image ? (
                 <div className="w-9 h-9 rounded-full overflow-hidden border border-beni-deep/40 shrink-0 mt-0.5">
                   <Image

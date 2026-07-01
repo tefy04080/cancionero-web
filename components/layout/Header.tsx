@@ -152,10 +152,10 @@ export default function Header() {
                       alt={session.user.name ?? 'Usuario'}
                       width={36}
                       height={36}
-                      className="rounded-full border-2 border-beni-gold/40"
+                      className="rounded-full border-2 border-beni-gold/40 animate-pulse-slow"
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-full bg-beni-deep flex items-center justify-center text-beni-gold font-bold">
+                    <div className="w-9 h-9 rounded-full bg-beni-deep flex items-center justify-center text-beni-gold font-bold animate-pulse-slow">
                       {session.user.name?.charAt(0) ?? '?'}
                     </div>
                   )}
