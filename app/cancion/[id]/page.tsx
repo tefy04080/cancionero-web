@@ -71,8 +71,8 @@ export default async function SongDetailPage({ params }: Props) {
         <div className="flex flex-wrap items-center gap-3 mb-8">
           <LikeButton songId={song.id} />
 
-          {/* Botón Ver/Descargar en YouTube */}
-          <DownloadButton youtubeUrl={song.youtubeUrl} />
+          {/* Botón descarga directa */}
+          <DownloadButton videoId={videoId ?? ''} title={song.title} />
 
           {/* Compartir */}
           <ShareButton title={song.title} />
