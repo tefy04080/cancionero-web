@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import confetti from 'canvas-confetti'
 
 interface Props {
   songId: string
@@ -27,12 +28,32 @@ export default function LikeButton({ songId }: Props) {
 
   const handleLike = async () => {
     if (!session) return
+    const wasLiked = liked
     setLoading(true)
     try {
       const res = await fetch(`/api/songs/${songId}/like`, { method: 'POST' })
       const data = await res.json()
       setLiked(data.liked)
       setCount(data.count)
+
+      // Animar si es un nuevo Like
+      if (!wasLiked && data.liked) {
+        const btn = document.getElementById('like-button')
+        if (btn) {
+          const rect = btn.getBoundingClientRect()
+          const x = (rect.left + rect.width / 2) / window.innerWidth
+          const y = (rect.top + rect.height / 2) / window.innerHeight
+          
+          confetti({
+            particleCount: 40,
+            spread: 60,
+            origin: { x, y },
+            colors: ['#f4a11d', '#52b788', '#ef4444', '#fef3e2'],
+            disableForReducedMotion: true,
+            zIndex: 100
+          })
+        }
+      }
     } finally {
       setLoading(false)
     }

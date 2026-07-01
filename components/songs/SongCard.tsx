@@ -36,7 +36,7 @@ export default function SongCard({ song, index = 0 }: SongCardProps) {
     <Link
       href={`/cancion/${song.id}`}
       id={`song-card-${song.id}`}
-      className="glass-card glass-card-hover rounded-2xl overflow-hidden block group"
+      className="glass-card glass-card-hover rounded-2xl overflow-hidden block group opacity-0 animate-fade-in-up"
       style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Thumbnail */}
